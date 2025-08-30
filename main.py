@@ -34,7 +34,7 @@ class Emma(App):
                     "model": "emma-assistant:latest",
                     "messages": [{"role": "user", "content": message}],
                     "stream": False
-                })
+                },timeout=30)
             response.raise_for_status()
             return response.json()['message']['content']
         except Exception as e:
