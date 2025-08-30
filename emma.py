@@ -17,7 +17,8 @@ class Emma(App):
             text = body["event"]["text"]
             user_id = body["event"]["user"]  # Gets the user ID like "U1234567890"
             ai_response = self.ask_ollama(text)
-            say(f"{ai_response}\nUser ID: {user_id}")
+            #say(f"{ai_response}\nUser ID: {user_id}")
+            say(f"{ai_response}")
 
     def init_message(self):
         @self.message("hello")
