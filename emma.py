@@ -25,7 +25,6 @@ class Emma(App):
             user_memory.append({"role":"user","content":text})
             ai_response = self.ask_ollama(user_memory)
             user_memory.append({"role":"assistant","content":ai_response})
-            #say(f"{ai_response}\nUser ID: {user_id}")
             say(f"{ai_response}")
 
     def init_message(self):
@@ -42,7 +41,7 @@ class Emma(App):
                     #"messages": [{"role": "user", "content": "".join(message)}],
                     "messages": [*user_memory],
                     "stream": False
-                },timeout=30)
+                },timeout=60)
             response.raise_for_status()
             return response.json()['message']['content']
         except Exception as e:
