@@ -5,7 +5,7 @@ from slack_bolt import App
 
 class Emma(App):
 
-    prompt_cache = []
+    prompt_index = {}
 
     def __init__(self,token):
         super().__init__(token=token)
@@ -18,9 +18,10 @@ class Emma(App):
             """When someone @mentions the bot"""
             text = body["event"]["text"]
             user_id = body["event"]["user"]  # Gets the user ID like "U1234567890"
-            Emma.prompt_cache.append(text)
-            ai_response = self.ask_ollama(*Emma.prompt_cache)
-            Emma.prompt_cache.append(ai_response)
+            prompt_cache = Emma.prompt_index.setdefault(user_id,[])
+            prompt_cache.append(text)
+            ai_response = self.ask_ollama(*prompt_cache)
+            prompt_cache.append(ai_response)
             #say(f"{ai_response}\nUser ID: {user_id}")
             say(f"{ai_response}")
 
