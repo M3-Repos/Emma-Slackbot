@@ -17,7 +17,7 @@ def emma_context():
     missing_var = [var for var in required_var if not config.get(var)]
 
     if missing_var:
-        raise ValueError(f"Missing required environment variables {" ".join(missing_var)}")
+        raise ValueError(f"Missing required environment variables {' '.join(missing_var)}")
     
     ollama_url = config.get("OLLAMA_BASE_URL","http://localhost:11434")
     ai_client = OllamaClient(base_url=ollama_url)
