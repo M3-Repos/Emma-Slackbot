@@ -8,17 +8,16 @@ from slack_bolt.adapter.socket_mode import SocketModeHandler
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+config = dotenv_values(".env")
+required_var = ["SLACK_BOT_TOKEN","SOCKET_MODEL_TOKEN"]
+missing_var = [var for var in required_var if not config.get(var)]
+
+if missing_var:
+    raise ValueError(f"Missing required environment variables {' '.join(missing_var)}")
 
 @contextmanager
 def emma_context():
-    config = dotenv_values(".env")
 
-    required_var = ["SLACK_BOT_TOKEN","SOCKET_MODEL_TOKEN"]
-    missing_var = [var for var in required_var if not config.get(var)]
-
-    if missing_var:
-        raise ValueError(f"Missing required environment variables {' '.join(missing_var)}")
-    
     ollama_url = config.get("OLLAMA_BASE_URL","http://localhost:11434")
     ai_client = OllamaClient(base_url=ollama_url)
     user_memories = {}
