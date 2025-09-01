@@ -2,6 +2,7 @@ import os
 import requests
 import json
 from slack_bolt import App
+from collections import deque
 
 class Emma(App):
 
@@ -18,25 +19,26 @@ class Emma(App):
             """When someone @mentions the bot"""
             text = body["event"]["text"]
             user_id = body["event"]["user"]  # Gets the user ID like "U1234567890"
-            user_memory = Emma.user_memories.setdefault(user_id,[])
-            user_memory.append(text)
-            ai_response = self.ask_ollama(*user_memory)
-            user_memory.append(ai_response)
+            user_memory = Emma.user_memories.setdefault(user_id,deque(maxlen=10))
+            user_memory.append({"role":"user","content":text})
+            ai_response = self.ask_ollama(user_memory)
+            user_memory.append({"role":"assistant","content":ai_response})
             #say(f"{ai_response}\nUser ID: {user_id}")
-            say(f"{ai_response}")
+            say(f"{user_memory}")
 
     def init_message(self):
         @self.message("hello")
         def message_hello(message, say):
             say(f"Hey there <@{message['user']}>!")
 
-    def ask_ollama(self,*message):
+    def ask_ollama(self,user_memory):
         """Send message to your Ollama API"""
         try:
             response = requests.post('http://localhost:11434/api/chat', 
                 json={
                     "model": "emma-assistant:latest",
-                    "messages": [{"role": "user", "content": "".join(message)}],
+                    #"messages": [{"role": "user", "content": "".join(message)}],
+                    "messages": [*user_memory],
                     "stream": False
                 },timeout=30)
             response.raise_for_status()
