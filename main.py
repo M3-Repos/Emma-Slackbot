@@ -13,8 +13,15 @@ logger = logging.getLogger(__name__)
 def emma_context():
     config = dotenv_values(".env")
 
+    required_var = ["SLACK_BOT_TOKEN","SOCKET_MODEL_TOKEN"]
+    missing_var = [var for var in required_var if not config.get(var)]
+
+    if missing_var:
+        raise ValueError(f"Missing required environment variables {" ".join(missing_var)}")
+    
+    ollama_url = config.get("OLLAMA_BASE_URL","http://localhost:11434")
+    ai_client = OllamaClient(base_url=ollama_url)
     user_memories = {}
-    ai_client = OllamaClient()
     emma_bot = Emma(
         token=config["SLACK_BOT_TOKEN"],
         user_memories=user_memories,
