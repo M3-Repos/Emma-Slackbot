@@ -1,12 +1,16 @@
 import requests
+import logging
 
 
 class OllamaClient:
     def __init__(self, base_url="http://localhost:11434"):
         self.base_url = base_url
+        self._logger = logging.getLogger(__name__)
+        self._logger.info("Ollama Client initialized")
 
     def chat(self, user_memory):
         try:
+            self._logger.info("Issuing request to Ollama")
             response = requests.post(
                 f"{self.base_url}/api/chat",
                 json={
@@ -17,6 +21,11 @@ class OllamaClient:
                 timeout=60,
             )
             response.raise_for_status()
+            self._logger.info("Ollama response successful")
             return response.json()["message"]["content"]
+        except requests.exceptions.RequestException as e:
+            self._logger.error(f"Ollama response unsuccessful: {e}")
+            return f"Sorry, I'm having trouble reaching the AI service right now.\n{str(e)}"
         except Exception as e:
-            return f"Sorry, I'm having trouble processing that request.\n{str(e)}"
+            self._logger.error(f"")
+            return f"Sorry, I'm having some trouble processing that request.\n{str(e)}"
