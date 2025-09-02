@@ -3,6 +3,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class OllamaClient:
     def __init__(self, base_url="http://localhost:11434"):
         self.base_url = base_url
@@ -21,7 +22,7 @@ class OllamaClient:
                 timeout=60,
             )
             response.raise_for_status()
-            logger.info("Ollama response successful")
+            logger.info("Ollama response successfull")
             return response.json()["message"]["content"]
         except requests.exceptions.RequestException as e:
             logger.error(f"Ollama response unsuccessful: {e}")

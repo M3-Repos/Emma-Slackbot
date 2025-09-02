@@ -1,24 +1,25 @@
-import logging
+import logging, time
+from tqdm import tqdm
 from contextlib import contextmanager
 from emma import Emma
 from ollama import OllamaClient
 from dotenv import dotenv_values
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, force=True)
 logger = logging.getLogger(__name__)
 
 config = dotenv_values(".env")
-required_var = ["SLACK_BOT_TOKEN","SOCKET_MODEL_TOKEN"]
+required_var = ["SLACK_BOT_TOKEN", "SOCKET_MODEL_TOKEN"]
 missing_var = [var for var in required_var if not config.get(var)]
 
 if missing_var:
     raise ValueError(f"Missing required environment variables {' '.join(missing_var)}")
 
+
 @contextmanager
 def emma_context():
-
-    ollama_url = config.get("OLLAMA_BASE_URL","http://localhost:11434")
+    ollama_url = config.get("OLLAMA_BASE_URL", "http://localhost:11434")
     ai_client = OllamaClient(base_url=ollama_url)
     user_memories = {}
     emma_bot = Emma(
@@ -32,6 +33,11 @@ def emma_context():
         handler = SocketModeHandler(
             app=emma_bot, app_token=config["SOCKET_MODEL_TOKEN"]
         )
+
+        for i in tqdm(range(100), desc="Emma bot loading", ncols=70):
+            time.sleep(.01)
+
+        logger.info("Emma bot has successfully started!! 🤗")
         yield handler
     finally:
         logger.info("Stopping Emma bot...")
